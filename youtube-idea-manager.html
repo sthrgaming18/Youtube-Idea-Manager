@@ -1,0 +1,2083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="YouTube Idea Studio - Professional content creation and planning tool">
+    <meta name="theme-color" content="#FF0000">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>YouTube Idea Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF0000;
+            --primary-dark: #CC0000;
+            --secondary: #FFFFFF;
+            --accent: #FF3333;
+            --bg: #FFFFFF;
+            --surface: #FFF5F5;
+            --surface-hover: #FFE5E5;
+            --text: #000000;
+            --text-dim: #666666;
+            --border: #FFB8B8;
+            --success: #00C853;
+            --warning: #FFC107;
+            --highlight-yellow: #FFEB3B;
+            --highlight-green: #76FF03;
+            --highlight-blue: #00B0FF;
+            --highlight-pink: #FF4081;
+            --highlight-orange: #FF9800;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--bg);
+            padding: 2rem 3rem;
+            border-bottom: 4px solid var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(255, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+            animation: fadeInDown 0.6s ease-out;
+            text-shadow: 2px 2px 4px rgba(255, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            animation: fadeInDown 0.6s ease-out 0.1s backwards;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin: 2rem 0 0 0;
+            border-bottom: 3px solid var(--border);
+            animation: fadeInDown 0.6s ease-out 0.2s backwards;
+        }
+
+        .tab {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            padding: 1rem 2rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .tab:hover {
+            color: var(--text);
+            background: var(--surface);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            font-weight: 900;
+        }
+
+        .tab.active::after {
+            width: 100%;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out 0.3s backwards;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(255, 0, 0, 0.05);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--primary);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+            transform-origin: top;
+        }
+
+        .card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            background: var(--bg);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.15);
+        }
+
+        .section-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .content-type-selector {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-label {
+            display: block;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+        }
+
+        .radio-option:hover .radio-label {
+            border-color: var(--primary);
+        }
+
+        .tag-input-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            min-height: 40px;
+            padding: 0.5rem;
+            background: var(--surface);
+            border-radius: 8px;
+            border: 2px dashed var(--border);
+        }
+
+        .tag-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'Roboto', sans-serif;
+            animation: slideInUp 0.3s ease-out;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.2s ease;
+            margin-left: 0.25rem;
+        }
+
+        .tag-remove:hover {
+            transform: scale(1.3);
+        }
+
+        .content-badge {
+            display: inline-block;
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 0.5rem;
+        }
+
+        .content-badge.indoor {
+            background: #FF6B6B;
+            color: white;
+        }
+
+        .content-badge.outdoor {
+            background: #51CF66;
+            color: white;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        input[type="url"],
+        textarea {
+            width: 100%;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--text);
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.1);
+            background: var(--surface);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: var(--bg);
+            border: none;
+            padding: 1.2rem 2.5rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 0, 0, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface);
+            border-color: var(--primary);
+            color: var(--text);
+        }
+
+        .idea-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .idea-item {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            animation: slideInUp 0.4s ease-out;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .idea-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.1);
+        }
+
+        .idea-item.expanded {
+            background: var(--surface);
+            border-color: var(--primary);
+            box-shadow: 0 6px 16px rgba(255, 0, 0, 0.15);
+        }
+
+        .idea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0;
+        }
+
+        .idea-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--text);
+            flex: 1;
+            transition: color 0.3s ease;
+        }
+
+        .idea-item:hover .idea-title {
+            color: var(--primary);
+        }
+
+        .idea-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .highlight-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .highlight-indicator:hover {
+            transform: scale(1.2);
+        }
+
+        .idea-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, margin-top 0.4s ease;
+            margin-top: 0;
+        }
+
+        .idea-item.expanded .idea-content {
+            max-height: 1000px;
+            margin-top: 1.5rem;
+        }
+
+        .idea-points {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .idea-points li {
+            padding: 0.75rem 0 0.75rem 2rem;
+            position: relative;
+            color: var(--text);
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .idea-points li::before {
+            content: '●';
+            position: absolute;
+            left: 0.5rem;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .idea-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--surface);
+            transform: translateY(-2px);
+        }
+
+        .competitor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .competitor-card {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            animation: scaleIn 0.4s ease-out;
+        }
+
+        .competitor-card:hover {
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(255, 0, 0, 0.15);
+        }
+
+        .channel-name {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .video-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .video-item {
+            padding: 0.75rem;
+            background: var(--surface);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .video-item:hover {
+            background: var(--bg);
+            transform: translateX(4px);
+            border-color: var(--primary);
+        }
+
+        .video-title {
+            color: var(--text);
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .video-stats {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+        }
+
+        .ai-suggestions {
+            display: grid;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .suggestion-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 10px;
+            padding: 1.5rem;
+            animation: slideInRight 0.4s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-card:hover {
+            border-left-color: var(--primary-dark);
+            transform: translateX(8px);
+            box-shadow: 0 6px 16px rgba(255, 0, 0, 0.15);
+        }
+
+        .suggestion-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .suggestion-desc {
+            color: var(--text);
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text);
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+        }
+
+        .spinner {
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-dim);
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .sub-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .sub-tab {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.75rem 1.5rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sub-tab:hover {
+            border-color: var(--primary);
+            color: var(--text);
+            transform: translateY(-2px);
+        }
+
+        .sub-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            font-weight: 700;
+        }
+
+        .sub-tab-content {
+            display: none;
+        }
+
+        .sub-tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .explore-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .explore-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .explore-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            opacity: 0.1;
+            border-radius: 0 12px 0 100%;
+            transition: all 0.3s ease;
+        }
+
+        .explore-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.2);
+        }
+
+        .explore-card:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .explore-category {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .explore-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        .explore-desc {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .explore-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .explore-tag {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .stat-value {
+            font-family: 'Roboto', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .video-card {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .video-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.15);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, var(--border) 0%, var(--surface) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .video-info {
+            padding: 1.25rem;
+        }
+
+        .video-card-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+            line-height: 1.4;
+        }
+
+        .video-metrics {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .metric-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .share-modal.active {
+            display: flex;
+        }
+
+        .share-modal-content {
+            background: var(--bg);
+            border: 3px solid var(--primary);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideInUp 0.4s ease-out;
+        }
+
+        .share-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .share-modal-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            font-size: 2rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-modal:hover {
+            background: var(--surface);
+            color: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .share-btn {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.2rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .share-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(255, 0, 0, 0.2);
+        }
+
+        .share-icon {
+            font-size: 2.5rem;
+        }
+
+        .share-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .share-preview {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text);
+            white-space: pre-wrap;
+            line-height: 1.6;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .highlighter-palette {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            margin-top: 0.5rem;
+        }
+
+        .highlighter-palette.active {
+            display: flex;
+        }
+
+        .highlighter-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .highlighter-color:hover {
+            transform: scale(1.15);
+            border-color: var(--text);
+        }
+
+        .highlighter-color.yellow { background: var(--highlight-yellow); }
+        .highlighter-color.green { background: var(--highlight-green); }
+        .highlighter-color.blue { background: var(--highlight-blue); }
+        .highlighter-color.pink { background: var(--highlight-pink); }
+        .highlighter-color.orange { background: var(--highlight-orange); }
+        .highlighter-color.none { 
+            background: var(--bg); 
+            border: 2px solid var(--border);
+        }
+
+        .idea-item[data-highlight="yellow"] {
+            background: linear-gradient(to right, var(--highlight-yellow) 0%, rgba(255, 235, 59, 0.1) 100%);
+        }
+
+        .idea-item[data-highlight="green"] {
+            background: linear-gradient(to right, var(--highlight-green) 0%, rgba(118, 255, 3, 0.1) 100%);
+        }
+
+        .idea-item[data-highlight="blue"] {
+            background: linear-gradient(to right, var(--highlight-blue) 0%, rgba(0, 176, 255, 0.1) 100%);
+        }
+
+        .idea-item[data-highlight="pink"] {
+            background: linear-gradient(to right, var(--highlight-pink) 0%, rgba(255, 64, 129, 0.1) 100%);
+        }
+
+        .idea-item[data-highlight="orange"] {
+            background: linear-gradient(to right, var(--highlight-orange) 0%, rgba(255, 152, 0, 0.1) 100%);
+        }
+
+        .expand-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+            display: inline-block;
+            margin-left: 0.5rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .idea-item.expanded .expand-icon {
+            transform: rotate(90deg);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            main {
+                padding: 1.5rem;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                padding: 0.75rem 1rem;
+                font-size: 0.75rem;
+            }
+
+            .competitor-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="header-content">
+                <h1>YouTube Idea Studio</h1>
+                <p class="subtitle">Content Creation Command Center</p>
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('ideas')">My Ideas</button>
+                    <button class="tab" onclick="switchTab('competitors')">Competitor Analysis</button>
+                    <button class="tab" onclick="switchTab('explore')">Explore</button>
+                    <button class="tab" onclick="switchTab('ai-ideas')">AI Idea Generator</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- My Ideas Tab -->
+            <div id="ideas-tab" class="tab-content active">
+                <div class="card">
+                    <h2 class="section-title">Create New Idea</h2>
+                    
+                    <!-- Content Type Selection -->
+                    <div class="input-group">
+                        <label>Content Type</label>
+                        <div class="content-type-selector">
+                            <label class="radio-option">
+                                <input type="radio" name="content-type" value="indoor" checked>
+                                <span class="radio-label">🏠 Indoor Content</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="content-type" value="outdoor">
+                                <span class="radio-label">🌳 Outdoor Content</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Video Title / Concept</label>
+                        <input type="text" id="idea-title" placeholder="Enter your video idea title...">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Key Points (one per line)</label>
+                        <textarea id="idea-points" placeholder="• Main point 1&#10;• Hook or intro idea&#10;• Key segment&#10;• Call to action"></textarea>
+                    </div>
+                    <button class="btn" onclick="addIdea()">
+                        <span style="position: relative; z-index: 1;">Save Idea</span>
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">Your Ideas</h2>
+                    <div id="ideas-list" class="idea-list"></div>
+                </div>
+            </div>
+
+            <!-- Competitor Analysis Tab -->
+            <div id="competitors-tab" class="tab-content">
+                <div class="card">
+                    <h2 class="section-title">Analyze Competitor Channel</h2>
+                    <div class="input-group">
+                        <label>YouTube Channel URL or ID</label>
+                        <input type="url" id="channel-url" placeholder="https://youtube.com/@channelname or channel ID">
+                    </div>
+                    <button class="btn" onclick="analyzeCompetitor()">
+                        <span style="position: relative; z-index: 1;">Analyze Channel</span>
+                    </button>
+                </div>
+
+                <div id="competitor-results"></div>
+            </div>
+
+            <!-- Explore Tab -->
+            <div id="explore-tab" class="tab-content">
+                <div class="card">
+                    <h2 class="section-title">Explore Trending Ideas</h2>
+                    <p style="color: var(--text-dim); margin-bottom: 2rem;">Discover random content ideas across different categories to spark your creativity</p>
+                    
+                    <button class="btn" onclick="loadExploreIdeas()">
+                        <span style="position: relative; z-index: 1;">🎲 Generate Random Ideas</span>
+                    </button>
+                </div>
+
+                <div id="explore-content"></div>
+            </div>
+
+            <!-- AI Idea Generator Tab -->
+            <div id="ai-ideas-tab" class="tab-content">
+                <div class="card">
+                    <h2 class="section-title">Generate Ideas from Viral Title</h2>
+                    <div class="input-group">
+                        <label>Viral Video Title</label>
+                        <input type="text" id="viral-title" placeholder="Enter a viral video title to get creative variations...">
+                    </div>
+                    <div class="input-group">
+                        <label>Your Niche (optional)</label>
+                        <input type="text" id="niche" placeholder="e.g., Tech Reviews, Cooking, Gaming, Education">
+                    </div>
+                    <button class="btn" onclick="generateAIIdeas()">
+                        <span style="position: relative; z-index: 1;">Generate Creative Ideas</span>
+                    </button>
+                </div>
+
+                <div id="ai-results"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="share-modal" onclick="closeShareModal(event)">
+        <div class="share-modal-content" onclick="event.stopPropagation()">
+            <div class="share-modal-header">
+                <h3 class="share-modal-title">Share Idea</h3>
+                <button class="close-modal" onclick="closeShareModal()">&times;</button>
+            </div>
+            
+            <div class="share-preview" id="share-preview"></div>
+            
+            <div class="share-options" id="share-options">
+                <!-- Share buttons will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let ideas = JSON.parse(localStorage.getItem('youtubeIdeas')) || [];
+        let competitors = JSON.parse(localStorage.getItem('competitors')) || [];
+
+        // Close highlighter palette when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.highlight-indicator') && !e.target.closest('.highlighter-palette')) {
+                document.querySelectorAll('.highlighter-palette').forEach(p => p.classList.remove('active'));
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeShareModal();
+            }
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        // Add new idea
+        function addIdea() {
+            const title = document.getElementById('idea-title').value.trim();
+            const pointsText = document.getElementById('idea-points').value.trim();
+            const contentType = document.querySelector('input[name="content-type"]:checked').value;
+            
+            if (!title) {
+                alert('Please enter a title for your idea');
+                return;
+            }
+
+            const points = pointsText.split('\n').filter(p => p.trim()).map(p => p.replace(/^[•\-\*]\s*/, ''));
+            
+            const idea = {
+                id: Date.now(),
+                title,
+                points,
+                contentType,
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString(),
+                highlight: 'none'
+            };
+
+            ideas.unshift(idea);
+            localStorage.setItem('youtubeIdeas', JSON.stringify(ideas));
+            
+            // Reset form
+            document.getElementById('idea-title').value = '';
+            document.getElementById('idea-points').value = '';
+            document.querySelector('input[name="content-type"][value="indoor"]').checked = true;
+            
+            renderIdeas();
+        }
+
+        // Render ideas
+        function renderIdeas() {
+            const container = document.getElementById('ideas-list');
+            
+            if (ideas.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💡</div>
+                        <p>No ideas yet. Start creating your content pipeline!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = ideas.map(idea => `
+                <div class="idea-item" data-id="${idea.id}" data-highlight="${idea.highlight || 'none'}" onclick="toggleIdea(${idea.id}, event)">
+                    <div class="idea-header">
+                        <div class="idea-title">
+                            <span class="expand-icon">▶</span>
+                            ${idea.contentType ? `<span class="content-badge ${idea.contentType}">${idea.contentType === 'indoor' ? '🏠 Indoor' : '🌳 Outdoor'}</span>` : ''}
+                            ${idea.title}
+                        </div>
+                        <div class="idea-meta">
+                            <span>${idea.date}</span>
+                            <div class="highlight-indicator" 
+                                 style="background: ${getHighlightColor(idea.highlight || 'none')}" 
+                                 onclick="toggleHighlighter(${idea.id}, event)"
+                                 title="Change highlight color">
+                            </div>
+                            <div class="highlighter-palette" id="palette-${idea.id}">
+                                <div class="highlighter-color yellow" onclick="setHighlight(${idea.id}, 'yellow', event)"></div>
+                                <div class="highlighter-color green" onclick="setHighlight(${idea.id}, 'green', event)"></div>
+                                <div class="highlighter-color blue" onclick="setHighlight(${idea.id}, 'blue', event)"></div>
+                                <div class="highlighter-color pink" onclick="setHighlight(${idea.id}, 'pink', event)"></div>
+                                <div class="highlighter-color orange" onclick="setHighlight(${idea.id}, 'orange', event)"></div>
+                                <div class="highlighter-color none" onclick="setHighlight(${idea.id}, 'none', event)">✕</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="idea-content">
+                        ${idea.points.length > 0 ? `
+                            <ul class="idea-points">
+                                ${idea.points.map(point => `<li>${point}</li>`).join('')}
+                            </ul>
+                        ` : ''}
+                        <div class="idea-actions">
+                            <button class="icon-btn" onclick="shareIdea(${idea.id}, event)">📤 Share</button>
+                            <button class="icon-btn" onclick="deleteIdea(${idea.id}, event)">🗑️ Delete</button>
+                            <button class="icon-btn" onclick="exportIdea(${idea.id}, event)">📋 Copy</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Toggle idea expansion
+        function toggleIdea(id, event) {
+            if (event.target.closest('.idea-meta') || 
+                event.target.closest('.icon-btn') || 
+                event.target.closest('.highlighter-palette')) {
+                return;
+            }
+            
+            const ideaElement = document.querySelector(`.idea-item[data-id="${id}"]`);
+            ideaElement.classList.toggle('expanded');
+        }
+
+        // Get highlight color
+        function getHighlightColor(highlight) {
+            const colors = {
+                'yellow': '#FFEB3B',
+                'green': '#76FF03',
+                'blue': '#00B0FF',
+                'pink': '#FF4081',
+                'orange': '#FF9800',
+                'none': '#FFFFFF'
+            };
+            return colors[highlight] || colors.none;
+        }
+
+        // Toggle highlighter palette
+        function toggleHighlighter(id, event) {
+            event.stopPropagation();
+            const palette = document.getElementById(`palette-${id}`);
+            
+            // Close all other palettes
+            document.querySelectorAll('.highlighter-palette').forEach(p => {
+                if (p.id !== `palette-${id}`) {
+                    p.classList.remove('active');
+                }
+            });
+            
+            palette.classList.toggle('active');
+        }
+
+        // Set highlight color
+        function setHighlight(id, color, event) {
+            event.stopPropagation();
+            
+            const ideaIndex = ideas.findIndex(i => i.id === id);
+            if (ideaIndex !== -1) {
+                ideas[ideaIndex].highlight = color;
+                localStorage.setItem('youtubeIdeas', JSON.stringify(ideas));
+                renderIdeas();
+            }
+        }
+
+        // Share idea
+        function shareIdea(id, event) {
+            event.stopPropagation();
+            const idea = ideas.find(i => i.id === id);
+            
+            if (!idea) return;
+            
+            // Format the share text
+            const contentType = idea.contentType === 'indoor' ? '🏠 Indoor Content' : '🌳 Outdoor Content';
+            const shareText = `📹 *${idea.title}*\n\n${contentType}\n\n📝 *Script/Key Points:*\n${idea.points.map((p, i) => `${i + 1}. ${p}`).join('\n')}\n\n🎬 Created with YouTube Idea Studio`;
+            
+            // Show share modal
+            document.getElementById('share-preview').textContent = shareText;
+            
+            // Create share options
+            const shareOptions = document.getElementById('share-options');
+            
+            // Encode for URL
+            const encodedText = encodeURIComponent(shareText);
+            
+            // Check if Web Share API is available
+            const hasWebShare = navigator.share !== undefined;
+            
+            shareOptions.innerHTML = `
+                ${hasWebShare ? `
+                    <button class="share-btn" onclick="shareViaWebShare(\`${shareText.replace(/`/g, '\\`')}\`)">
+                        <span class="share-icon">📱</span>
+                        <span class="share-label">Share</span>
+                    </button>
+                ` : ''}
+                
+                <a href="https://wa.me/?text=${encodedText}" target="_blank" class="share-btn">
+                    <span class="share-icon">💬</span>
+                    <span class="share-label">WhatsApp</span>
+                </a>
+                
+                <a href="https://telegram.me/share/url?text=${encodedText}" target="_blank" class="share-btn">
+                    <span class="share-icon">✈️</span>
+                    <span class="share-label">Telegram</span>
+                </a>
+                
+                <a href="https://twitter.com/intent/tweet?text=${encodedText}" target="_blank" class="share-btn">
+                    <span class="share-icon">🐦</span>
+                    <span class="share-label">Twitter</span>
+                </a>
+                
+                <a href="mailto:?subject=${encodeURIComponent(idea.title)}&body=${encodedText}" class="share-btn">
+                    <span class="share-icon">📧</span>
+                    <span class="share-label">Email</span>
+                </a>
+                
+                <button class="share-btn" onclick="copyShareText(\`${shareText.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`)">
+                    <span class="share-icon">📋</span>
+                    <span class="share-label">Copy Text</span>
+                </button>
+            `;
+            
+            document.getElementById('share-modal').classList.add('active');
+        }
+
+        // Web Share API
+        async function shareViaWebShare(text) {
+            try {
+                await navigator.share({
+                    title: 'YouTube Idea',
+                    text: text
+                });
+                closeShareModal();
+            } catch (err) {
+                console.log('Share cancelled or failed');
+            }
+        }
+
+        // Copy share text to clipboard
+        function copyShareText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Copied to clipboard!');
+                closeShareModal();
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        // Close share modal
+        function closeShareModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('share-modal').classList.remove('active');
+        }
+
+        // Delete idea
+        function deleteIdea(id, event) {
+            event.stopPropagation();
+            if (confirm('Delete this idea?')) {
+                ideas = ideas.filter(idea => idea.id !== id);
+                localStorage.setItem('youtubeIdeas', JSON.stringify(ideas));
+                renderIdeas();
+            }
+        }
+
+        // Export idea (copy to clipboard)
+        function exportIdea(id, event) {
+            event.stopPropagation();
+            const idea = ideas.find(i => i.id === id);
+            const contentType = idea.contentType === 'indoor' ? '🏠 Indoor Content' : '🌳 Outdoor Content';
+            const text = `${idea.title}\n${contentType}\n\n${idea.points.map((p, i) => `${i + 1}. ${p}`).join('\n')}`;
+            navigator.clipboard.writeText(text);
+            alert('Idea copied to clipboard!');
+        }
+
+        // Analyze competitor (uses AI API)
+        async function analyzeCompetitor() {
+            const channelUrl = document.getElementById('channel-url').value.trim();
+            
+            if (!channelUrl) {
+                alert('Please enter a YouTube channel URL');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('competitor-results');
+            resultsDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing competitor channel...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch("https://api.anthropic.com/v1/messages", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 1000,
+                        messages: [{
+                            role: "user",
+                            content: `Analyze this YouTube channel and provide content insights: ${channelUrl}
+
+Please search for recent videos from this channel and provide:
+1. Channel overview (subscriber count, content style)
+2. Top 5 most recent or popular video titles
+3. Common themes and patterns
+4. Content suggestions based on their successful videos
+
+Format as JSON with: channelName, subscriberCount, topVideos (array of {title, views}), themes (array), suggestions (array)`
+                        }],
+                        tools: [{
+                            type: "web_search_20250305",
+                            name: "web_search"
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                let analysisText = data.content
+                    .map(item => item.type === "text" ? item.text : "")
+                    .filter(Boolean)
+                    .join("\n");
+
+                // Try to parse JSON from the response
+                const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
+                let analysis;
+                
+                if (jsonMatch) {
+                    try {
+                        analysis = JSON.parse(jsonMatch[0]);
+                    } catch (e) {
+                        // If JSON parsing fails, create structure from text
+                        analysis = {
+                            channelName: "Channel Analysis",
+                            subscriberCount: "N/A",
+                            topVideos: [],
+                            themes: [],
+                            suggestions: analysisText.split('\n').filter(line => line.trim())
+                        };
+                    }
+                } else {
+                    analysis = {
+                        channelName: "Channel Analysis",
+                        subscriberCount: "N/A",
+                        topVideos: [],
+                        themes: [],
+                        suggestions: analysisText.split('\n').filter(line => line.trim())
+                    };
+                }
+
+                displayCompetitorAnalysis(analysis);
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="card">
+                        <p style="color: var(--warning);">⚠️ Error analyzing channel. Please make sure you entered a valid YouTube channel URL.</p>
+                        <p style="color: var(--text-dim); margin-top: 1rem; font-size: 0.9rem;">Note: This feature requires Claude AI API access to analyze live channel data.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Display competitor analysis
+        function displayCompetitorAnalysis(analysis) {
+            const resultsDiv = document.getElementById('competitor-results');
+            
+            // Extract data with better structure
+            const channelName = analysis.channelName || "Channel Analysis";
+            const subscribers = analysis.subscriberCount || "N/A";
+            const topVideos = analysis.topVideos || [];
+            const themes = analysis.themes || [];
+            const suggestions = analysis.suggestions || [];
+            
+            resultsDiv.innerHTML = `
+                <div class="card">
+                    <h2 class="section-title">${channelName}</h2>
+                    
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${subscribers}</div>
+                            <div class="stat-label">Subscribers</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${topVideos.length}</div>
+                            <div class="stat-label">Videos Analyzed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${themes.length}</div>
+                            <div class="stat-label">Key Themes</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sub Tabs -->
+                    <div class="sub-tabs">
+                        <button class="sub-tab active" onclick="switchSubTab('overview')">📊 Overview</button>
+                        <button class="sub-tab" onclick="switchSubTab('best-videos')">🎬 Best Videos</button>
+                        <button class="sub-tab" onclick="switchSubTab('content-themes')">🎯 Content Themes</button>
+                        <button class="sub-tab" onclick="switchSubTab('suggestions')">💡 Suggestions</button>
+                    </div>
+                    
+                    <!-- Overview Sub-Tab -->
+                    <div id="overview-subtab" class="sub-tab-content active">
+                        <h3 style="font-family: 'Roboto', sans-serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 1rem; color: var(--primary);">Channel Overview</h3>
+                        <p style="color: var(--text); line-height: 1.8; font-size: 1.05rem;">
+                            This channel has <strong>${subscribers}</strong> subscribers and focuses on creating engaging content. 
+                            ${themes.length > 0 ? `The main content themes include: ${themes.slice(0, 3).join(', ')}.` : ''}
+                        </p>
+                    </div>
+                    
+                    <!-- Best Videos Sub-Tab -->
+                    <div id="best-videos-subtab" class="sub-tab-content">
+                        <h3 style="font-family: 'Roboto', sans-serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 1.5rem; color: var(--primary);">Top Performing Videos</h3>
+                        ${topVideos.length > 0 ? `
+                            <div class="video-grid">
+                                ${topVideos.map((video, index) => `
+                                    <div class="video-card">
+                                        <div class="video-thumbnail">🎥</div>
+                                        <div class="video-info">
+                                            <div class="video-card-title">${video.title}</div>
+                                            <div class="video-metrics">
+                                                <span class="metric-item">👁️ ${video.views || 'N/A'}</span>
+                                                <span class="metric-item">#${index + 1}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<p style="color: var(--text-dim);">No video data available</p>'}
+                    </div>
+                    
+                    <!-- Content Themes Sub-Tab -->
+                    <div id="content-themes-subtab" class="sub-tab-content">
+                        <h3 style="font-family: 'Roboto', sans-serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 1.5rem; color: var(--primary);">Content Themes & Patterns</h3>
+                        ${themes.length > 0 ? `
+                            <div class="explore-grid">
+                                ${themes.map((theme, index) => `
+                                    <div class="explore-card">
+                                        <span class="explore-category">Theme ${index + 1}</span>
+                                        <h4 class="explore-title">${theme}</h4>
+                                        <p class="explore-desc">This theme appears consistently across the channel's content strategy.</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<p style="color: var(--text-dim);">No theme data available</p>'}
+                    </div>
+                    
+                    <!-- Suggestions Sub-Tab -->
+                    <div id="suggestions-subtab" class="sub-tab-content">
+                        <h3 style="font-family: 'Roboto', sans-serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 1.5rem; color: var(--primary);">Content Suggestions</h3>
+                        <div class="ai-suggestions">
+                            ${suggestions.map((suggestion, index) => `
+                                <div class="suggestion-card">
+                                    <div class="suggestion-title">Suggestion ${index + 1}</div>
+                                    <p class="suggestion-desc">${suggestion}</p>
+                                    <button class="btn-secondary icon-btn" style="margin-top: 1rem;" onclick="saveAIIdea('${suggestion.substring(0, 50)}...', '${suggestion.replace(/'/g, "\\'")}')">
+                                        💾 Save to My Ideas
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Switch sub-tabs
+        function switchSubTab(subTabName) {
+            document.querySelectorAll('.sub-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.sub-tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${subTabName}-subtab`).classList.add('active');
+        }
+
+        // Generate AI ideas from viral title
+        async function generateAIIdeas() {
+            const viralTitle = document.getElementById('viral-title').value.trim();
+            const niche = document.getElementById('niche').value.trim();
+            
+            if (!viralTitle) {
+                alert('Please enter a viral video title');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('ai-results');
+            resultsDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Generating creative ideas...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch("https://api.anthropic.com/v1/messages", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 1000,
+                        messages: [{
+                            role: "user",
+                            content: `Generate 5 creative and unique video title ideas inspired by this viral title: "${viralTitle}"
+${niche ? `\nNiche: ${niche}` : ''}
+
+For each idea, provide:
+1. A catchy, different title (not just a copy)
+2. Brief description of the video concept
+3. Why it could work
+
+Format as JSON array: [{title, description, reason}]`
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                let responseText = data.content
+                    .map(item => item.type === "text" ? item.text : "")
+                    .filter(Boolean)
+                    .join("\n");
+
+                // Try to parse JSON
+                const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+                let suggestions;
+                
+                if (jsonMatch) {
+                    try {
+                        suggestions = JSON.parse(jsonMatch[0]);
+                    } catch (e) {
+                        // Fallback: create suggestions from text
+                        suggestions = responseText.split('\n')
+                            .filter(line => line.trim() && !line.includes('```'))
+                            .slice(0, 5)
+                            .map((line, i) => ({
+                                title: `Idea ${i + 1}`,
+                                description: line,
+                                reason: "AI-generated variation"
+                            }));
+                    }
+                } else {
+                    suggestions = [{
+                        title: "Creative Variation",
+                        description: responseText,
+                        reason: "Based on viral title analysis"
+                    }];
+                }
+
+                displayAIIdeas(suggestions);
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="card">
+                        <p style="color: var(--warning);">⚠️ Error generating ideas. Please try again.</p>
+                        <p style="color: var(--text-dim); margin-top: 1rem; font-size: 0.9rem;">Note: This feature uses Claude AI to generate creative video ideas.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Display AI-generated ideas
+        function displayAIIdeas(suggestions) {
+            const resultsDiv = document.getElementById('ai-results');
+            resultsDiv.innerHTML = `
+                <div class="ai-suggestions">
+                    ${suggestions.map((idea, index) => `
+                        <div class="suggestion-card">
+                            <div class="suggestion-title">${idea.title}</div>
+                            <p class="suggestion-desc">${idea.description}</p>
+                            ${idea.reason ? `
+                                <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace;">
+                                    💡 ${idea.reason}
+                                </p>
+                            ` : ''}
+                            <button class="btn-secondary icon-btn" style="margin-top: 1rem;" onclick="saveAIIdea('${idea.title.replace(/'/g, "\\'")}', '${idea.description.replace(/'/g, "\\'")}')">
+                                💾 Save to My Ideas
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Save AI-generated idea to My Ideas
+        function saveAIIdea(title, description) {
+            const idea = {
+                id: Date.now(),
+                title,
+                points: [description],
+                contentType: 'indoor',
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString(),
+                highlight: 'none'
+            };
+
+            ideas.unshift(idea);
+            localStorage.setItem('youtubeIdeas', JSON.stringify(ideas));
+            
+            alert('Idea saved to My Ideas tab!');
+            renderIdeas();
+        }
+
+        // Load explore ideas
+        async function loadExploreIdeas() {
+            const exploreContent = document.getElementById('explore-content');
+            exploreContent.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Generating random creative ideas...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch("https://api.anthropic.com/v1/messages", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 1000,
+                        messages: [{
+                            role: "user",
+                            content: `Generate 6 random, creative YouTube video ideas across different categories. Make them unique, trending-worthy, and diverse.
+
+For each idea provide:
+1. Category (e.g., Tech, Lifestyle, Education, Entertainment, DIY, Finance, etc.)
+2. Video title (catchy and engaging)
+3. Brief description (2-3 sentences)
+4. 3 relevant tags/keywords
+
+Format as JSON array: [{category, title, description, tags: [tag1, tag2, tag3]}]`
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                let responseText = data.content
+                    .map(item => item.type === "text" ? item.text : "")
+                    .filter(Boolean)
+                    .join("\n");
+
+                // Try to parse JSON
+                const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+                let ideas;
+                
+                if (jsonMatch) {
+                    try {
+                        ideas = JSON.parse(jsonMatch[0]);
+                    } catch (e) {
+                        // Fallback ideas
+                        ideas = generateFallbackIdeas();
+                    }
+                } else {
+                    ideas = generateFallbackIdeas();
+                }
+
+                displayExploreIdeas(ideas);
+                
+            } catch (error) {
+                exploreContent.innerHTML = `
+                    <div class="card">
+                        <p style="color: var(--warning);">⚠️ Error generating ideas. Showing sample ideas instead.</p>
+                    </div>
+                `;
+                displayExploreIdeas(generateFallbackIdeas());
+            }
+        }
+
+        // Generate fallback ideas
+        function generateFallbackIdeas() {
+            return [
+                {
+                    category: "Tech",
+                    title: "I Built an AI That Does My Job (Scary Results)",
+                    description: "Testing the limits of AI automation by having it completely take over my daily workflow for a week. The results were both impressive and concerning.",
+                    tags: ["AI", "Automation", "Productivity"]
+                },
+                {
+                    category: "Lifestyle",
+                    title: "Living on $0 for 30 Days Challenge",
+                    description: "Can you survive a month without spending any money? Watch as I attempt this extreme minimalist challenge using only bartering and free resources.",
+                    tags: ["Challenge", "Minimalism", "Budget"]
+                },
+                {
+                    category: "Education",
+                    title: "Why Nobody Taught You THIS in School",
+                    description: "Essential life skills and knowledge that the education system completely ignores. From financial literacy to emotional intelligence.",
+                    tags: ["Life Skills", "Education", "Learning"]
+                },
+                {
+                    category: "Entertainment",
+                    title: "Recreating Viral Videos But Make it EXPENSIVE",
+                    description: "Taking trending TikTok and YouTube challenges and redoing them with unlimited budget. How different can they be?",
+                    tags: ["Viral", "Trends", "Comedy"]
+                },
+                {
+                    category: "DIY",
+                    title: "Turning Trash into Treasure: $5 to $500",
+                    description: "Finding discarded items and transforming them into high-value products through creative upcycling and restoration.",
+                    tags: ["Upcycling", "Restoration", "Creative"]
+                },
+                {
+                    category: "Finance",
+                    title: "I Tried Every Side Hustle on the Internet (Results Shocked Me)",
+                    description: "Testing 15 different passive income methods over 90 days to see which ones actually work and which are complete scams.",
+                    tags: ["Side Hustle", "Passive Income", "Money"]
+                }
+            ];
+        }
+
+        // Display explore ideas
+        function displayExploreIdeas(ideas) {
+            const exploreContent = document.getElementById('explore-content');
+            exploreContent.innerHTML = `
+                <div class="explore-grid">
+                    ${ideas.map(idea => `
+                        <div class="explore-card" onclick="saveExploreIdea('${idea.title.replace(/'/g, "\\'")}', '${idea.description.replace(/'/g, "\\'")}')">
+                            <span class="explore-category">${idea.category}</span>
+                            <h3 class="explore-title">${idea.title}</h3>
+                            <p class="explore-desc">${idea.description}</p>
+                            <div class="explore-tags">
+                                ${idea.tags.map(tag => `<span class="explore-tag">#${tag}</span>`).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Save explore idea
+        function saveExploreIdea(title, description) {
+            const idea = {
+                id: Date.now(),
+                title,
+                points: [description],
+                contentType: 'indoor',
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString(),
+                highlight: 'none'
+            };
+
+            ideas.unshift(idea);
+            localStorage.setItem('youtubeIdeas', JSON.stringify(ideas));
+            
+            alert('💡 Idea saved to My Ideas tab!');
+            renderIdeas();
+        }
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
+            });
+        }
+
+        // Initialize
+        renderIdeas();
+    </script>
+</body>
+</html>

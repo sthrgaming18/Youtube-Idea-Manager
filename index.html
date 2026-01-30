@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#FF0000">
+    <title>Install YouTube Idea Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            color: #000;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: #FF0000;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: #FF0000;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: #FF0000;
+            color: white;
+            border: none;
+            padding: 1.2rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+        }
+
+        .btn:hover {
+            background: #CC0000;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #FF0000;
+            border: 2px solid #FF0000;
+        }
+
+        .btn-secondary:hover {
+            background: #FF0000;
+            color: white;
+        }
+
+        .features {
+            text-align: left;
+            margin: 2rem 0;
+            background: #FFF5F5;
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .feature-item {
+            padding: 0.5rem 0;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .feature-item::before {
+            content: "✓ ";
+            color: #FF0000;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .instructions {
+            background: #F0F0F0;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #FF0000;
+            margin-bottom: 1rem;
+        }
+
+        .step {
+            padding: 0.5rem 0;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        #install-button {
+            display: none;
+        }
+
+        .note {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🎬</div>
+        <h1>YouTube Idea Studio</h1>
+        <p>Professional content creation and planning tool for YouTube creators</p>
+
+        <div class="features">
+            <div class="feature-item">Create and organize video ideas</div>
+            <div class="feature-item">Indoor & Outdoor content categorization</div>
+            <div class="feature-item">AI-powered idea generation</div>
+            <div class="feature-item">Competitor channel analysis</div>
+            <div class="feature-item">Share ideas via WhatsApp, Telegram, Email</div>
+            <div class="feature-item">Works offline after installation</div>
+            <div class="feature-item">Color-coded highlighters</div>
+        </div>
+
+        <button id="install-button" class="btn" onclick="installApp()">
+            📱 Install App Now
+        </button>
+
+        <a href="youtube-idea-manager.html" class="btn">
+            🚀 Launch App
+        </a>
+
+        <div class="instructions">
+            <h3>📱 How to Install on Your Phone:</h3>
+            
+            <div style="margin-top: 1rem;">
+                <strong>Android (Chrome):</strong>
+                <div class="step">1. Tap the menu (⋮) in Chrome</div>
+                <div class="step">2. Select "Add to Home screen"</div>
+                <div class="step">3. Tap "Add" and you're done!</div>
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <strong>iPhone (Safari):</strong>
+                <div class="step">1. Tap the Share button (⬆️)</div>
+                <div class="step">2. Scroll and tap "Add to Home Screen"</div>
+                <div class="step">3. Tap "Add" and enjoy!</div>
+            </div>
+        </div>
+
+        <p class="note">
+            💡 First launch the app above, then install it to your home screen for the best experience!
+        </p>
+    </div>
+
+    <script>
+        let deferredPrompt;
+
+        // Check if app is already installed
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            document.getElementById('install-button').style.display = 'none';
+        }
+
+        // Listen for the install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-button').style.display = 'inline-block';
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('App installed');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('install-button').style.display = 'none';
+                });
+            }
+        }
+
+        // Track installation
+        window.addEventListener('appinstalled', () => {
+            console.log('YouTube Idea Studio installed successfully!');
+            document.getElementById('install-button').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
